@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+## GPS configuration
+$(call inherit-product, device/common/gps/gps_eu_supl.mk)
+
 ## Media
 PRODUCT_PACKAGES += \
     libOmxCore \
@@ -34,8 +37,8 @@ PRODUCT_PACKAGES += \
 
 ## Camera
 PRODUCT_PACKAGES += \
-    libcamera \
-    LegacyCamera 
+    LegacyCamera \
+    camera.gio 
 
 ## GPS
 PRODUCT_PACKAGES += \
@@ -75,11 +78,14 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/samsung/msm7x27-common/ramdisk/lib/modules/fsr.ko:root/lib/modules/fsr.ko \
     device/samsung/msm7x27-common/ramdisk/lib/modules/fsr_stl.ko:root/lib/modules/fsr_stl.ko \
-    device/samsung/msm7x27-common/ramdisk/lib/modules/sec_param.ko:root/lib/modules/sec_param.ko
+    device/samsung/msm7x27-common/ramdisk/lib/modules/sec_param.ko:root/lib/modules/sec_param.ko \
+    device/samsung/msm7x27-common/ramdisk/lib/modules/rfs_fat.ko:root/lib/modules/rfs_fat.ko \
+    device/samsung/msm7x27-common/ramdisk/lib/modules/rfs_glue.ko:root/lib/modules/rfs_glue.ko
 
 ## Prebuilt init.d scripts
 PRODUCT_COPY_FILES += \
-    device/samsung/msm7x27-common/prebuilt/etc/init.d/01bt:system/etc/init.d/01bt  
+    device/samsung/msm7x27-common/prebuilt/etc/init.d/01bt:system/etc/init.d/01bt \
+    device/samsung/msm7x27-common/prebuilt/etc/init.d/02compcache:system/etc/init.d/02compcache 
 
 ## Wi-Fi & networking
 PRODUCT_COPY_FILES += \
@@ -117,14 +123,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/samsung/msm7x27-common/prebuilt/lib/hw/gps.msm7x27.so:system/lib/hw/gps.msm7x27.so
 
-## Custom GPS config
-PRODUCT_COPY_FILES += \
-    device/samsung/msm7x27-common/prebuilt/etc/gps.conf:system/etc/gps.conf \
-    device/samsung/msm7x27-common/prebuilt/etc/secgps.conf:system/etc/secgps.conf
-
-# LDPI assets
+## Other
 PRODUCT_LOCALES += en
-
-# Build.prop overrides
-PRODUCT_PROPERTY_OVERRIDES += \
-    pm.sleep_mode=1
+PRODUCT_AAPT_CONFIG := ldpi mdpi normal
