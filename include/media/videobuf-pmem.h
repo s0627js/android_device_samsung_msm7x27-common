@@ -1,4 +1,4 @@
-/* Copyright (c) 2009, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -25,62 +25,36 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
+ * helper functions for physically contiguous PMEM capture buffers
  */
 
-#ifndef __MSM_ROTATOR_H__
+#ifndef _VIDEOBUF_PMEM_CONTIG_H
+#define _VIDEOBUF_PMEM_CONTIG_H
 
-#include <linux/types.h>
-#include <linux/msm_mdp.h>
+#include <media/videobuf-core.h>
 
-#define MSM_ROTATOR_IOCTL_MAGIC 'R'
-
-#define MSM_ROTATOR_IOCTL_START   \
-		_IOWR(MSM_ROTATOR_IOCTL_MAGIC, 1, struct msm_rotator_img_info)
-#define MSM_ROTATOR_IOCTL_ROTATE   \
-		_IOW(MSM_ROTATOR_IOCTL_MAGIC, 2, struct msm_rotator_data_info)
-#define MSM_ROTATOR_IOCTL_FINISH   \
-		_IOW(MSM_ROTATOR_IOCTL_MAGIC, 3, int)
-
-#define ROTATOR_VERSION_01	0xA5B4C301
-
-enum rotator_clk_type {
-	ROTATOR_AXI_CLK,
-	ROTATOR_PCLK,
-	ROTATOR_IMEM_CLK
+struct videobuf_contig_pmem {
+	u32 magic;
+	void *vaddr;
+	int phyaddr;
+	unsigned long size;
+	int is_userptr;
+	uint32_t y_off;
+	uint32_t cbcr_off;
+	int buffer_type;
 };
 
-struct msm_rotator_img_info {
-	unsigned int session_id;
-	struct msmfb_img  src;
-	struct msmfb_img  dst;
-	struct mdp_rect src_rect;
-	unsigned int    dst_x;
-	unsigned int    dst_y;
-	unsigned char   rotations;
-	int enable;
-        unsigned int  downscale_ratio;
-};
+void videobuf_queue_pmem_contig_init(struct videobuf_queue *q,
+			const struct videobuf_queue_ops *ops,
+			struct device *dev,
+			spinlock_t *irqlock,
+			enum v4l2_buf_type type,
+			enum v4l2_field field,
+			unsigned int msize,
+			void *priv);
 
-struct msm_rotator_data_info {
-	int session_id;
-	struct msmfb_data src;
-	struct msmfb_data dst;
-	unsigned int version_key;
-	struct msmfb_data src_chroma;
-	struct msmfb_data dst_chroma;
-};
+int videobuf_to_pmem_contig(struct videobuf_buffer *buf);
+int videobuf_pmem_contig_free(struct videobuf_queue *q,
+			struct videobuf_buffer *buf);
 
-struct msm_rot_clocks {
-	const char *clk_name;
-	enum rotator_clk_type clk_type;
-	unsigned int clk_rate;
-};
-
-struct msm_rotator_platform_data {
-	unsigned int number_of_clocks;
-	unsigned int hardware_version_number;
-	struct msm_rot_clocks *rotator_clks;
-	const char *regulator_name;
-};
-#endif
-
+#endif /* _VIDEOBUF_PMEM_CONTIG_H */
